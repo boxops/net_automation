@@ -4,16 +4,18 @@
 from netmiko import ConnectHandler  # Import ConnectHandler function to read the dictionary and create an ssh connection
 from getpass import getpass  # Import getpass function to prompt the user for password
 
+host = input("Enter csr1000v IP address : ")
+username = input("Enter csr1000v username : ")
 password = getpass("Enter csr1000v ssh password : ")
 secret = getpass("Enter csr1000v enable password : ")
 
 csr1000v = {
     "device_type": "cisco_ios",
-    "host": "40.120.49.51",
-    "username": "csr1",
+    "host": host,
+    "username": username,
     "password": password,  # getpass() function prompts for password
-    "port": 22,  # optional, defaults to 22
-    # "secret": "class", # optional, enable if privilege 0
+    "port": 22,  # defaults to 22
+    "secret": secret, # enable if privilege 0
 }
 
 net_connect = ConnectHandler(**csr1000v)  # Initialize the connection to the router
@@ -60,7 +62,7 @@ def run_options():
         elif choice == 3:
             show_ip_route()
         elif choice == 4:
-            show_vlan()
+            show_vlans()
         elif choice == 5:
             show_syslog()
         elif choice == 6:
@@ -77,7 +79,7 @@ def run_options():
 
 def show_int():  # choice 1
     output = net_connect.send_command("show ip int b")
-    print("Done Showing IP int brief")
+    print("Done Showing IP Int Brief")
     print(output)
 
 
@@ -93,14 +95,14 @@ def show_ip_route():  # choice 3
     print(output)
 
 
-def show_vlan():  # choice 4
-    output = net_connect.send_command("show vlan")
+def show_vlans():  # choice 4
+    output = net_connect.send_command("show vlans")
     print("Done Showing VLANs")
     print(output)
 
 
 def show_syslog():  # choice 5
-    output = net_connect.send_command("show syslog")
+    output = net_connect.send_command("show logging")
     print("Done Showing Syslog")
     print(output)
 
@@ -118,36 +120,15 @@ def backup_dev_conf():  # choice 7
 
 
 def compare_run_start():  # choice 8
-    sh_run = []
-    output = net_connect.send_command("sh run")
-    sh_run.append(output)
-
-    sh_start = open("router_startup_conf").read()
-
-    for runline in sh_run:
-        for startline in sh_start:
-            if runline != startline:
-                print("Unmatched config at line : " + sh_run[runline] + "!")
-                print(runline)
-                print(startline)
-
+    output = net_connect.send_command("show archive config differences")
     print("Done Comparing Running-config to Startup-config")
+    print(output)
 
 
 def compare_run_back():  # choice 9
-    sh_run = []
-    output = net_connect.send_command("sh run")
-    sh_run.append(output)
-
-    sh_back = open("router_backup_conf").read()
-
-    for runline in sh_run:
-        for backline in sh_back:
-            if runline != backline:
-                print("Unmatched config at line : " + sh_run[runline] + "!")
-                print(runline)
-                print(backline)
+    output = net_connect.send_command("show archive config differences system:running-config http:[file2path]")
     print("Done Comparing Running-config to Backup-config")
+    print(output)
 
 
 run_options()
