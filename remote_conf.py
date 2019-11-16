@@ -1,29 +1,36 @@
-# Python network automation tool for establishing ssh connections and pulling output from Cisco IOS
-# Append the output to a file like so: python netmiko_print_conf.py >> ios_conf
+# Python network automation tool for establishing ssh connections and pulling output from devices
+from netmiko import ConnectHandler  # import ConnectHandler function to create an ssh connection
+from getpass import getpass  # import getpass function to prompt the user for password
+import napalm
+import json  # import json library to work with dictionaries
 
-from netmiko import ConnectHandler  # Import ConnectHandler function to read the dictionary and create an ssh connection
-from getpass import getpass  # Import getpass function to prompt the user for password
+# device_type = []  # create empty lists
+# host = []
+# username = []
+# password = []
+# port = []
+# secret = []
 
-host = input("Enter csr1000v IP address : ")
-username = input("Enter csr1000v username : ")
-password = getpass("Enter csr1000v ssh password : ")
-secret = getpass("Enter csr1000v enable password : ")
+# device = {"device_type": device_type, "host": host, "username": username, "password": password, "port": port}
 
-csr1000v = {
-    "device_type": "cisco_ios",
-    "host": host,
-    "username": username,
-    "password": password,  # getpass() function prompts for password
-    "port": 22,  # defaults to 22
-    "secret": secret, # enable if privilege 0
-}
+with open("device.json", "r") as f:  # read device info from a file
+    # node = f.read()
+    device = json.load(f)
 
-net_connect = ConnectHandler(**csr1000v)  # Initialize the connection to the router
+# device_type.append(input(str("Enter device type : ")))
+# host.append(input(str("Enter device IP address : ")))
+# username.append(str(input("Enter device username : ")))
+# password.append(getpass("Enter device ssh password : "))
+# port.append(input(str("Enter device port : ")))
+# secret.append(getpass("Enter device enable password : "))
+
+net_connect = ConnectHandler(**device)  # Initialize the ssh connection to the device
 print("Connection Successful")
 
 
 def main_menu():
     option = None
+    print(" ")
     print("Configuration Menu.")
     print(" ")
     print("1 - Show Interfaces")
@@ -36,8 +43,6 @@ def main_menu():
     print("8 - Compare Running-config to Startup-config")
     print("9 - Compare Running-config to Backup-config")
     print("0 - Exit from Configuration Menu")
-    print(" ")
-    # print("Press any Key to roll back : " # option to roll back if part of the script fails
     loop = 1
     while loop == 1:  # while loop checks for correct user input
         try:
@@ -55,80 +60,47 @@ def run_options():
     loop = True
     while loop:
         choice = main_menu()
-        if choice == 1:
-            show_int()
-        elif choice == 2:
-            show_run()
-        elif choice == 3:
-            show_ip_route()
-        elif choice == 4:
-            show_vlans()
-        elif choice == 5:
-            show_syslog()
-        elif choice == 6:
-            show_ios_version()
-        elif choice == 7:
-            backup_dev_conf()
-        elif choice == 8:
-            compare_run_start()
-        elif choice == 9:
-            compare_run_back()
-        elif choice == 0:
+        if choice == 1:  # show interfaces
+            output = net_connect.send_command("show ip int b")
+            print("Done Showing IP Int Brief")
+            print(output)
+        elif choice == 2:  # show running-config
+            output = net_connect.send_command("show run")
+            print("Done Showing Running-config")
+            print(output)
+        elif choice == 3:  # show routing table
+            output = net_connect.send_command("show ip route")
+            print("Done Showing IP Route")
+            print(output)
+        elif choice == 4:  # show vlans
+            output = net_connect.send_command("show vlans")
+            print("Done Showing VLANs")
+            print(output)
+        elif choice == 5:  # show syslog
+            output = net_connect.send_command("show logging")
+            print("Done Showing Syslog")
+            print(output)
+        elif choice == 6:  # show ios version
+            output = net_connect.send_command("show version")
+            print("Done Showing iOS Version")
+            print(output)
+        elif choice == 7:  # backup running-config
+            output = net_connect.send_command("wr")
+            print("Done Backing up Device Configurations")
+            print(output)
+        elif choice == 8:  # compare the running configuration of a network device with the start-up configuration
+            output = net_connect.send_command(
+                "show archive config differences system:running-config nvram:startup-config")
+            print("Done Comparing Running-config to Startup-config")
+            print(output)
+            # (+) means that the configuration line exists in the startup-config but not in the running-config
+            # (-) means that the configuration line exists in running-config but not in startup-config
+        elif choice == 9:  # compare the running configuration of a network device with a local offline version
+            output = net_connect.send_command("show archive config differences system:running-config http:[file2path]")
+            print("Done Comparing Running-config to Backup-config")
+            print(output)
+        elif choice == 0:  # end script
             loop = False
-
-
-def show_int():  # choice 1
-    output = net_connect.send_command("show ip int b")
-    print("Done Showing IP Int Brief")
-    print(output)
-
-
-def show_run():  # choice 2
-    output = net_connect.send_command("show run")
-    print("Done Showing Running-config")
-    print(output)
-
-
-def show_ip_route():  # choice 3
-    output = net_connect.send_command("show ip route")
-    print("Done Showing IP Route")
-    print(output)
-
-
-def show_vlans():  # choice 4
-    output = net_connect.send_command("show vlans")
-    print("Done Showing VLANs")
-    print(output)
-
-
-def show_syslog():  # choice 5
-    output = net_connect.send_command("show logging")
-    print("Done Showing Syslog")
-    print(output)
-
-
-def show_ios_version():  # choice 6
-    output = net_connect.send_command("show version")
-    print("Done Showing iOS Version")
-    print(output)
-
-
-def backup_dev_conf():  # choice 7
-    output = net_connect.send_command("copy run start")
-    print("Done Backing up Device Configurations")
-    print(output)
-
-
-def compare_run_start():  # choice 8
-    output = net_connect.send_command("show archive config differences")
-    print("Done Comparing Running-config to Startup-config")
-    print(output)
-
-
-def compare_run_back():  # choice 9
-    output = net_connect.send_command("show archive config differences system:running-config http:[file2path]")
-    print("Done Comparing Running-config to Backup-config")
-    print(output)
 
 
 run_options()
