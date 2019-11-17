@@ -1,13 +1,19 @@
-csr1000v1 = {"device_type": "cisco_ios",
-             "host": "192.168.181.129",
-             "username": "admin",
-             "password": "Cisco123",
-             "port": "22"}
+# ssh connection info
+csr1000v1 = {
+    "device_type": "cisco_ios",
+    "host": "192.168.181.129",
+    "username": "admin",
+    "password": "Cisco123",
+    "port": "22"
+}
 
-csr1000v2 = {"host": "192.168.181.129",
-             "port": 830,
-             "username": "admin",
-             "password": "Cisco123"}
+# netConf connection info
+csr1000v2 = {
+    "host": "192.168.181.129",
+    "port": 830,
+    "username": "admin",
+    "password": "Cisco123"
+}
 
 ios_xe1 = {
     "host": "ios-xe-mgmt.cisco.com",
