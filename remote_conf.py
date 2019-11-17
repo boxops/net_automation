@@ -1,30 +1,26 @@
 # Python network automation tool for establishing ssh connections and pulling output from devices
 from netmiko import ConnectHandler  # import ConnectHandler function to create an ssh connection
 from getpass import getpass  # import getpass function to prompt the user for password
-import napalm
+from device_info import csr1000v1
 import json  # import json library to work with dictionaries
 
-# device_type = []  # create empty lists
-# host = []
-# username = []
-# password = []
-# port = []
-# secret = []
+# with open("device.json", "r") as f:  # read device info from a file
+#     device = json.load(f)
 
-# device = {"device_type": device_type, "host": host, "username": username, "password": password, "port": port}
+# device_type = csr1000v1["device_type"]
+# host = csr1000v1["host"]
+# port = csr1000v1["port"]
+# username = csr1000v1["username"]
+# password = csr1000v1["password"]
 
-with open("device.json", "r") as f:  # read device info from a file
-    # node = f.read()
-    device = json.load(f)
+# device_type = (input(str("Enter device type : ")))
+# host = (input(str("Enter device IP address : ")))
+# port = (input(str("Enter device port : ")))
+# username = (str(input("Enter device username : ")))
+# password = (getpass("Enter device ssh password : "))
+# secret = (getpass("Enter device enable password : "))
 
-# device_type.append(input(str("Enter device type : ")))
-# host.append(input(str("Enter device IP address : ")))
-# username.append(str(input("Enter device username : ")))
-# password.append(getpass("Enter device ssh password : "))
-# port.append(input(str("Enter device port : ")))
-# secret.append(getpass("Enter device enable password : "))
-
-net_connect = ConnectHandler(**device)  # Initialize the ssh connection to the device
+net_connect = ConnectHandler(**csr1000v1)  # Initialize the ssh connection to the device
 print("Connection Successful")
 
 
