@@ -99,7 +99,7 @@ def run_options():
                 output = net_connect.send_command("show archive config differences system:running-config flash:" + backup)
                 print("Done Comparing Running-config to Backup-config")
                 print(output)
-            elif select == "C":  # use scp to copy a backup file to flash
+            elif select == "C":  # use scp_copy.py to copy a backup file to flash
                 scp_copy.scp_copy()
                 output = net_connect.send_command("show archive config differences system:running-config flash:" + scp_copy.scp_copy(backup))
                 print("Done Comparing Running-config to Backup-config")
