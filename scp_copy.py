@@ -1,12 +1,18 @@
 import os
+from device_info import csr1000v1
 
 
 def scp_copy():
-    username = input(str("Select Source username : "))
-    ip_address = input(str("Select Source IP Address : "))
-    absolute_path = input(str("Input the Absolute Path to the file : "))
-    backup = input(str("Name the File to store : "))
+    username = csr1000v1["username"]
+    host = csr1000v1["host"]
+    absolute = input("Absolute Path to the file: ")
+    copy_name = input("Name the File to store in flash: ")
+    password = csr1000v1["password"]
     # example -> scp C:\Users\olahb\Documents\backup.txt admin@192.168.181.129:flash:backup
-    scp = "scp " + absolute_path + " " + username + "@" + ip_address + ":" + "flash:" + backup
+    scp = "scp %s %s@%s:flash:%s" % (absolute, username, host, copy_name)
+
+    print(scp)
     os.system(scp)
-    return backup
+
+
+scp_copy()
