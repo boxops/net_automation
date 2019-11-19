@@ -2,6 +2,7 @@
 from netmiko import ConnectHandler  # import ConnectHandler function to create an ssh connection
 from getpass import getpass  # import getpass function to prompt the user for password
 from device_info import csr1000v1
+import scp_copy
 import json  # import json library to work with dictionaries
 
 # with open("device.json", "r") as f:  # read device info from a file
@@ -92,20 +93,15 @@ def run_options():
             # (+) means that the configuration line exists in the startup-config but not in the running-config
             # (-) means that the configuration line exists in running-config but not in startup-config
         elif choice == 9:  # compare the running configuration of a network device with a local offline version
-            select = input(str("Select backup file from flash: or copy a backup file to flash: ? (S) or (C)"))
+            select = input(str("Select backup file from flash: or copy a backup file to flash: ? (S) or (C) "))
             if select == "S":
                 backup = input(str("Name of the backup file in flash: "))
                 output = net_connect.send_command("show archive config differences system:running-config flash:" + backup)
                 print("Done Comparing Running-config to Backup-config")
                 print(output)
-            elif select == "C":  # use scp to copy a backup file to the flash, then run "def (compareRunBack)"
-                username = input(str("Select SCP username : "))
-                ip_address = input(str("Select SCP IP Address : "))
-                backup = input(str("Select SCP backup file to copy over : "))
-                # command = copy scp://username@ip_address//home/username/backup flash:backup
-                command = "copy scp://" + username + "@" + ip_address + "//home/" + username + "/" + backup + " " + "flash:" + backup
-                net_connect.send_command(command)
-                output = net_connect.send_command("show archive config differences system:running-config flash:" + backup)
+            elif select == "C":  # use scp to copy a backup file to flash
+                scp_copy.scp_copy()
+                output = net_connect.send_command("show archive config differences system:running-config flash:" + scp_copy.scp_copy(backup))
                 print("Done Comparing Running-config to Backup-config")
                 print(output)
         elif choice == 0:  # end script
