@@ -20,3 +20,7 @@ iOS XE Guestshell Setup and Config:
 https://github.com/CiscoDevNet/netprog_basics/blob/master/application_hosting/python_onbox/iosxe_guestshell_setup.txt
 
 https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/166/b_166_programmability_cg/guest_shell.html
+
+iOS XE Guestshell scripts:
+
+https://github.com/CiscoDevNet/csr_aws_guestshell
