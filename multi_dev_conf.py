@@ -1,87 +1,53 @@
-from netmiko import Netmiko
-from getpass import getpass
-
-cisco1 = {
-    "host": "cisco1.twb-tech.com",
-    "username": "pyclass",
-    "password": password,
-    "device_type": "cisco_ios"
-    "secret": secret,
-}
-
-cisco2 = {
-    "host": "cisco2.twb-tech.com",
-    "username": "pyclass",
-    "password": password,
-    "device_type": "cisco_ios",
-}
-
-nxos1 = {
-    "host": "nxos1.twb-tech.com",
-    "username": "pyclass",
-    "password": password,
-    "device_type": "cisco_nxos",
-}
-
-srx1 = {
-    "host": "srx1.twb-tech.com",
-    "username": "pyclass",
-    "password": password,
-    "device_type": "juniper_junos",
-}
-
-password = getpass("Enter " + device_name + "password : ")
-secret = getpass("Enter " + device_name + " enable secret : ")
+import netmiko  # import connection libraries and device_info.py file
+from netmiko import ConnectHandler
+import device_info
+import socket
+import os
 
 
-for device in (cisco1, cisco2, nxos1, srx1):
-    net_connect = Netmiko(**device)
-    print(net_connect.find_prompt())
+# (optional) prompt the user for "backup multiple configuration" option in the main file
+# or run the "multi_dev_conf.py" file separately
+# (optional) print a list of devices from device_info.py file to choose from
 
 
-def main_menu():
-    global option
-    print("Configuration Menu.")
-    print(" ")
-    print("1 - Show Interfaces")
-    print("2 - Show Running-config")
-    print("3 - Show IP Routes")
-    print("4 - Backup Device Configurations")
-    print("5 - Simultaneous Configuration of Multiple Devices")
-    print(" ")
-    # print("Press any Key to roll back : " # option to roll back if part of the script fails
-    loop = True
-    while loop:  # while loop prevents the program from crashing
-        option = None
-        option = input("Enter Option").strip()
-    if option == str:
-        loop = False
-        return
-    elif option == int:
-        if 1 <= option <= 5:  # input value 1, 2, 3, 4, 5
-            loop = False
-            return option
+def multi_dev():
+    devices_list = [device_info.csr1000v1, device_info.csr1000v2]
+    config_commands = "sh run"
+
+    file = open('backup_conf', 'w+')
+    for device in devices_list:  # for device in (chosen devices): connect to device
+        # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ping = os.system('ping -n 1 ' + device["host"])  # ping device
+        if ping == 0:
+            print(" ")
+            print("Pinged Device: ", device["host"])
+            file.write("IP address: " + device["host"] + "\n")
+
+            try:  # if ping was successful: try connecting to the device
+                session = ConnectHandler(**device)
+            except netmiko.ssh_exception.AuthenticationException:
+                print("SSH Connection Unsuccessful")
+                continue  # if connection failed: print(failed connection) and continue
+            except ValueError:
+                print("Either ip or host must be set")
+                continue
+
+            # if the connection was successful: print(successful connection)
+            print("SSH Connection Successful")
+            output = session.send_command(config_commands)
+            print(f"Device type: {device['device_type']} \n\n")
+            print(output)
+            file.write(f"Device type: {device['device_type']} \n\n")  # backup running configuration to a file
+            file.write(output)
+            file.write("\n")
+            session.disconnect()  # (important) close connection
         else:
-            print("Invalid input.")
-    else:
-        pass
+            print("Failed to Ping Device: ", device["host"])
+            continue  # if the connection failed: carry on connecting to other devices without interruption
+    file.close()
+
+# (optional) print(list of failed devices to connect)
+# (optional) print(list of failed devices to backup)
 
 
-def run_options():
-    loop = 1
-    while loop == 1:
-        choice = main_menu()
-        if choice == 1:
-            ShowInt()
-        elif choice == 2:
-            ShowRun()
-        elif choice == 3:
-            ShowIPRoute()
-        elif choice == 4:
-            BackupDev()
-        elif choice == 5:
-            SimConfAll()
-        else:
-            loop = 0
-
-
+multi_dev()
