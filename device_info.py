@@ -1,4 +1,3 @@
-# ssh connection info
 csr1000v1 = {
     "device_type": "cisco_ios",
     "host": "192.168.181.129",
@@ -7,45 +6,42 @@ csr1000v1 = {
     "port": "22"
 }
 
-# netConf connection info
 csr1000v2 = {
-    "host": "192.168.181.129",
-    "port": 830,
+    "device_type": "cisco_ios",
+    "host": "192.168.126.135",
     "username": "admin",
-    "password": "Cisco123"
+    "password": "Cisco123",
+    "port": "22"
 }
 
-ios_xe1 = {
-    "host": "ios-xe-mgmt.cisco.com",
-    "port": 10000,
-    "username": "developer",
-    "password": "C1sco12345"
-}
-
-ios_xe_latest = {
-    "host": "ios-xe-mgmt-latest.cisco.com",
-    "port": 10000,
-    "username": "developer",
-    "password": "C1sco12345"
-}
-
-ios_xe2 = {
-    "host": "10.10.20.48",
-    "port": 830,
-    "username": "developer",
-    "password": "C1sco12345"
-}
-
-apicem = {
-    "host": "sandboxapicem.cisco.com",
-    "username": "devnetuser",
-    "password": "Cisco123!",
-    "port": 443
-}
-
-apic = {
-    "host": "https://sandboxapicdc.cisco.com",
-    "username": "admin",
-    "password": "ciscopsdt",
-    "port": 443
-}
+# c2960v12 = {
+#     "device_type": "cisco_ios",
+#     "host": "192.168.181.130",
+#     "username": "admin",
+#     "password": "Cisco123",
+#     "port": "22"
+# }
+#
+# c2960v15 = {
+#     "device_type": "cisco_ios",
+#     "host": "192.168.181.131",
+#     "username": "admin",
+#     "password": "Cisco123",
+#     "port": "22"
+# }
+#
+# c3560v14 = {
+#     "device_type": "cisco_ios",
+#     "host": "192.168.181.132",
+#     "username": "admin",
+#     "password": "Cisco123",
+#     "port": "22"
+# }
+#
+# c3650v16 = {
+#     "device_type": "cisco_ios",
+#     "host": "192.168.181.133",
+#     "username": "admin",
+#     "password": "Cisco123",
+#     "port": "22"
+# }
