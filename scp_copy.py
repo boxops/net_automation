@@ -1,18 +1,27 @@
-import os
-from device_info import csr1000v1
+from __future__ import print_function, unicode_literals
+from getpass import getpass
+from netmiko import ConnectHandler, file_transfer
+import device_info
+
+# password = getpass("Input SSH Password : ")
+
+source_file = 'cisco_ios_backup.txt'
+dest_file = 'backup'
+file_system = 'flash:'
+direction = 'put'
 
 
 def scp_copy():
-    username = csr1000v1["username"]
-    host = csr1000v1["host"]
-    absolute = input("Absolute Path to the file: ")
-    copy_name = input("Name the File to store in flash: ")
-    password = csr1000v1["password"]
-    # example -> scp C:\Users\olahb\Documents\backup.txt admin@192.168.181.129:flash:backup
-    scp = "scp %s %s@%s:flash:%s" % (absolute, username, host, copy_name)
-
-    print(scp)
-    os.system(scp)
+    for net_device in (device_info.csr1000v1, device_info.csr1000v2):
+        # Create the Netmiko SSH connection
+        session = ConnectHandler(**net_device)
+        scp = file_transfer(session,
+                            source_file=source_file,
+                            dest_file=dest_file,
+                            file_system=file_system,
+                            direction=direction,
+                            overwrite_file=True)
+        print(scp)
 
 
 scp_copy()
