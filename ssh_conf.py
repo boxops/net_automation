@@ -1,10 +1,13 @@
 # Set Up an IOS Router or Switch as SSH Client
-# There are four steps required to enable SSH support on a Cisco IOS router:
+# There are four steps required to enable SSH support on a Cisco IOS:
 
 # 1. Configure the hostname command.
 # 2. Configure the DNS domain.
 # 3. Generate the SSH key to be used.
 # 4. Enable SSH transport support for the virtual type terminal (vtys).
+
+
+# !!! Change or remove the hostname when configuring switches !!!
 
 
 configure terminal
