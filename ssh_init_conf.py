@@ -7,17 +7,17 @@
 # 4. Enable SSH transport support for the virtual type terminal (vtys).
 
 
-# configure terminal
-# hostname R1
-# ip domain name cisco.com
-# username admin privilege 15 password Cisco123
-# line vty 0 4
-# login local
-# transport input all
-# exit
-# crypto key generate rsa
-# 1024
-# ip ssh version 2
-# banner motd # Unauthorised access is strictly prohibited! #
-# end
-# wr
+configure terminal
+hostname R1
+ip domain name cisco.com
+username admin privilege 15 password Cisco123
+line vty 0 4
+login local
+transport input all
+exit
+crypto key generate rsa
+1024
+ip ssh version 2
+banner motd # Unauthorised access is strictly prohibited! #
+end
+wr
