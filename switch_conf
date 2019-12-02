@@ -9,13 +9,15 @@ name VLAN3
 exit
 int f0/1
 switchport mode trunk
+no shutdown
 exit
 int f0/2
 switchport modetrunk
+no shutdown
 exit
 int vlan 2
 ip add 10.0.2.2 255.255.255.0
-no sh
+no shutdown
 exit
 ip default-gateway 10.0.0.1
 end
@@ -32,10 +34,11 @@ name VLAN3
 exit
 int f0/2
 switchport mode trunk
+no shutdown
 exit
 int vlan 3
 ip add 10.0.3.2 255.255.255.0
-no sh
+no shutdown
 exit
 ip default-gateway 10.0.0.1
 end
