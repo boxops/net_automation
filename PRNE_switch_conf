@@ -1,3 +1,6 @@
+
+
+
 #S1
 
 conf t
@@ -12,7 +15,7 @@ switchport mode trunk
 no shutdown
 exit
 int f0/2
-switchport modetrunk
+switchport mode trunk
 no shutdown
 exit
 int vlan 2
