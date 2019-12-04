@@ -11,11 +11,23 @@
 
 
 configure terminal
-hostname R1
 ip domain name cisco.com
 username admin privilege 15 password Cisco123
+line con 0
+password cisco
+login
+exit
 line vty 0 4
+password cisco
 login local
+logging synchronous
+transport input all
+exit
+
+line vty 5 15
+password cisco
+login local
+logging synchronous
 transport input all
 exit
 crypto key generate rsa
