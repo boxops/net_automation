@@ -4,25 +4,24 @@ from netmiko import ConnectHandler
 
 iox = ["configure terminal",
        "iox",
-       "do sh iox-service",
        "int VirtualPortGroup 0",
-       "ip add 192.168.35.1 255.255.255.0"
+       "ip add 192.168.100.1 255.255.255.0"
        "no sh",
        "ip nat inside",
        "exit",
-       "int GigabitEthernet 1",
+       "int GigabitEthernet 3",
        "ip nat outside",
        "exit",
        "ip access-list standard NAT_ACL",
        "permit 192.168.0.0 0.0.255.255",
        "exit",
-       "ip nat inside source list NAT_ACL interface GigabitEthernet1 overload",
+       "ip nat inside source list NAT_ACL interface GigabitEthernet3 overload",
        "app-hosting appid guestshell",
        "app-vnic gateway1 virtualportgroup 0 guest-interface 0",
-       "guest-ipaddress 192.168.35.2 netmask 255.255.255.0",
+       "guest-ipaddress 192.168.100.2 netmask 255.255.255.0",
        "exit"
-       "app-default-gateway 192.168.35.1 guest-interface 0",
-       "name-server0 208.67.222.222",
+       "app-default-gateway 192.168.100.1 guest-interface 0",
+       "name-server0 8.8.8.8",
        "end",
        "wr",
        "guestshell enable",
@@ -30,7 +29,7 @@ iox = ["configure terminal",
 
 device = {
     "device_type": "cisco_ios",
-    "host": "192.168.181.129",
+    "host": "192.168.126.137",
     "username": "admin",
     "password": "Cisco123",
     "port": "22"
