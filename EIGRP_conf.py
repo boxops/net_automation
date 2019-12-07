@@ -11,35 +11,59 @@ device = {
     "port": "22"
 }
 
-eigrp_config_commands = ["router eigrp 10",
-                         "network 10.0.100.0 0.0.0.255",
-                         "network 192.168.100.0 0.0.0.255",
-                         "network 192.168.126.0 0.0.0.255"]
-
 session = ConnectHandler(**device)
-# print(session.send_config_set(eigrp))
-command = session.send_command("show ip route | include C")
-connected_routes = str(command)
+
+interface_names = []
+eigrp_networks = []
+wildcards = []
+networks = []
+netmasks = []
+
+# get interface names
+interfaces = session.send_command("show ip int b")
+for line in interfaces.split("\n"):
+    interface_names.append(line.split(" ", 1)[0])
+interface_names.pop(0)  # remove interface header
+# print(interface_names)
+
+# get cidr connected networks
+connected_routes = session.send_command("show ip route | include C")
+connected_networks = re.findall("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:/\d{1,2}|)", connected_routes)
+# print(connected_networks)
+
+# get netmask from cidr connected networks
+for item in connected_networks:
+    # print(item)
+    network = str(netaddr.IPNetwork(item).network)
+    networks.append(network)
+    netmask = str(netaddr.IPNetwork(item).netmask)
+    netmasks.append(netmask)
+    wildcard = str(netaddr.IPNetwork(item).hostmask)
+    wildcards.append(wildcard)
+
+# print(networks)
+# print(netmasks)
+# print(wildcards)
+
+# construct eigrp networks
+for item in range(1, len(networks), 1):
+    eigrp = str(networks[item] + " " + wildcards[item])
+    eigrp_networks.append(eigrp)
+
+print(eigrp_networks)
+
+eigrp_identifier = input(str("Enter a unique identifier number for EIGRP: "))
+eigrp_passive = input((str(interface_names)) + "\nChoose passive interfaces for EIGRP from the list: ")
+
+eigrp_config_commands = ["router eigrp " + eigrp_identifier,
+                         "no auto-summary",
+                         passive_interfaces,
+                         eigrp_networks]
+
+
+def device_configuration():
+    print(session.send_config_set(eigrp_config_commands))
+
+
+device_configuration()
 session.disconnect()
-
-ip_list = re.findall("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:/\d{1,2}|)", connected_routes)
-
-
-def wildcard_conversion(subnet):
-    wildcard = []
-    for octet in subnet.split('.'):
-        inverse = 255 - int(octet)
-        wildcard.append(str(inverse))
-    wildcard = '.'.join(wildcard)
-    return wildcard
-
-
-def eigrp_network():
-    for item in ip_list:
-        cidr = netaddr.IPNetwork(item)
-        subnet = str(cidr.netmask)
-        print(cidr.ip, wildcard_conversion(subnet))
-
-
-eigrp_network()
-
