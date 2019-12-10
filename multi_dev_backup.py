@@ -4,7 +4,7 @@ import os
 
 # Customise variables before running the script
 # ---------------------------------------------------------------------------------------------------------
-commands = ["sh run", "sh vlan", "sh syslog"]  # cisco ios commands to execute and write output into a file
+commands = ["sh run", "sh vlan", "sh logging"]  # cisco ios commands to execute and write output into a file
 operating_system = "Windows"  # choose the operating system the script is running on: Windows, Linux or Mac
 ping_count = str(4)  # alter the number of pings to speed up or slow down the script
 # ---------------------------------------------------------------------------------------------------------
@@ -57,16 +57,18 @@ def multi_dev():
                 continue
 
             for command in commands:  # loop through a list of commands
-                file_name = str(devices_file["ip"][i] + "_" + devices_file["device"][i] + command.strip(' ') + "_conf")
+                file_name = str(devices_file["ip"][i] + "_" + devices_file["device"][i] +
+                                "_" + '_'.join(command.split(' ')[::1]) + "_conf.txt")
                 file = open(file_name, "w+")  # open a file to write to, create one if it doesn't exist
                 output = session.send_command(command)  # sends a command through the current session
                 print(f"Device type: {devices_file['device'][i]} \n")
-                print(f"Writing command into a file: " + command)
+                print(f"Writing command output into a file: " + command)
                 print(output)
                 file.write(output)  # appends the output to the open file
-                print("Successfully Saved Device Configuration to '" + file_name + "' File!")
-                session.disconnect()  # (important) close connection
+                print("\nSuccessfully saved " + command + " command output to '" + file_name + "' file!")
                 file.close()  # (important) close file
+
+            session.disconnect()  # (important) close connection
 
         else:
             print(" ")
