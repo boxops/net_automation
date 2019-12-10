@@ -2,14 +2,19 @@ import json
 import netmiko
 import os
 
-devices_file = input(str("Enter the name of the devices file : "))
-backup = "sh run"
-failed_ping = []
-failed_ssh = []
-ping_count = str(4)
+# Customise variables before running the script
+# ---------------------------------------------------------------------------------------------------------
+commands = ["sh run", "sh vlan", "sh syslog"]  # cisco ios commands to execute and write output into a file
+operating_system = "Windows"  # choose the operating system the script is running on: Windows, Linux or Mac
+ping_count = str(4)  # alter the number of pings to speed up or slow down the script
+# ---------------------------------------------------------------------------------------------------------
+
+devices_file = input(str("Enter the name of the devices file: "))  # input the name of the file to read from
+failed_ping = []  # collection of IP addresses that the script failed to ping
+failed_ssh = []  # collection of IP addresses that the script failed to connect to
 
 try:
-    with open(devices_file, "r") as js:
+    with open(devices_file, "r") as js:  # get the content of the file provided by the user
         devices_file = json.load(js)  # open and convert file to json format
 except IOError:
     print("Config file is broken or name entered incorrectly")
@@ -18,63 +23,78 @@ except IOError:
 
 
 def multi_dev():
-    for i in range(0, len(devices_file["device"]), 1):
-        ping = os.system("ping -n " + ping_count + " " + devices_file["ip"][i])  # ping '-n' on Windows, '-c' on Linux
+    for i in range(0, len(devices_file["device"]), 1):  # get the length of a value pair and loop through the dictionary
+        # ping '-n' option on Windows; ping '-c' option on Linux and Mac
+        ping = None
+        if operating_system == "Windows":  # ping command option changes based on different operating systems
+            ping = os.system("ping -n " + ping_count + " " + devices_file["ip"][i])
+        elif operating_system == "Linux" or operating_system == "Mac":
+            ping = os.system("ping -c " + ping_count + " " + devices_file["ip"][i])
+        else:
+            print("Unknown Operating System. Exiting script.")
+            exit()  # end script if operating system variable is not valid
 
-        if ping == 0:
+        if ping == 0:  # if ping was successful: try connecting to the device
             print(" ")
             print("Pinged Device: ", devices_file["ip"][i])
 
             # ssh "username"@"ip" -c aes128-cbc (Windows and Linux ssh command used to force exchange a private ssh key)
-            try:  # if ping was successful: try connecting to the device
+            try:  # values from the dictionary are passed to netmiko for establishing an ssh connection
                 session = netmiko.ConnectHandler(device_type=devices_file["device"][i], host=devices_file["ip"][i],
                                                  username=devices_file["usr"][i], password=devices_file["pw"][i],
-                                                 secret=devices_file["en"][i])
-            except netmiko.ssh_exception.AuthenticationException:
+                                                 secret=devices_file["en"][i], verbose=True)
+            except netmiko.ssh_exception.AuthenticationException:  # incorrect ssh credentials
                 print("SSH Connection Unsuccessful")
-                failed_ssh.append(devices_file["ip"][i])
-                continue  # if connection failed: print(failed connection) and continue
-            except netmiko.ssh_exception.NetMikoTimeoutException:
+                failed_ssh.append(devices_file["ip"][i])  # if connection fails: append IP to a variable for later use
+                continue  # if connection failed: print(failed connection) and continue to the next device
+            except netmiko.ssh_exception.NetMikoTimeoutException:  # ssh connection timeout
                 print("SSH Connection Timed Out")
                 failed_ssh.append(devices_file["ip"][i])
                 continue
-            except ValueError:
-                print("Either ip or host must be set")
+            except ValueError:  # incorrect values given, such as IP address
+                print("Either IP or Host must be set")
                 failed_ssh.append(devices_file["ip"][i])
                 continue
 
-            # if the connection was successful: print(successful connection)
-            print("SSH Connection Successful")
-            file_name = str(devices_file["ip"][i] + "_" + devices_file["device"][i] + "_backup_conf.txt")
-            file = open(file_name, "w+")
-            output = session.send_command(backup)
-            print(f"Device type: {devices_file['device'][i]} \n\n")
-            print(output)
-            file.write(output)
-            session.disconnect()  # (important) close connection
-            file.close()
+            for command in commands:  # loop through a list of commands
+                file_name = str(devices_file["ip"][i] + "_" + devices_file["device"][i] + command.strip(' ') + "_conf")
+                file = open(file_name, "w+")  # open a file to write to, create one if it doesn't exist
+                output = session.send_command(command)  # sends a command through the current session
+                print(f"Device type: {devices_file['device'][i]} \n")
+                print(f"Writing command into a file: " + command)
+                print(output)
+                file.write(output)  # appends the output to the open file
+                print("Successfully Saved Device Configuration to '" + file_name + "' File!")
+                session.disconnect()  # (important) close connection
+                file.close()  # (important) close file
 
         else:
             print(" ")
             print("Failed to Ping Device: ", devices_file["ip"][i])
-            failed_ping.append(devices_file["ip"][i])
-            continue  # if the connection failed: carry on connecting to other devices without interruption
+            failed_ping.append(devices_file["ip"][i])  # if ping fails: append IP to a variable for the report
+            continue  # if the ping fails: carry on pinging other devices without interruption
 
 
 multi_dev()
 
+# print a report of failed pings and ssh connections
 if len(failed_ping) != 0:
     print(" ")
-    print("Failed to ping device(s): ")
+    print("------------- Ping Report -------------")
+    print("Failed to Ping device(s): ")
     print(failed_ping)
 elif len(failed_ping) == 0:
     print(" ")
-    print("All devices were pinged successfully!")
+    print("------------- Ping Report -------------")
+    print("All devices were Pinged successfully!")
 
 if len(failed_ssh) != 0:
     print(" ")
-    print("Failed to connect to device(s): ")
+    print("------------- SSH Report -------------")
+    print("Failed to Connect to device(s): ")
     print(failed_ssh)
 elif len(failed_ssh) == 0:
     print(" ")
-    print("All devices were connected successfully!")
+    print("------------- SSH Report -------------")
+    print("All devices were Connected successfully!")
+
