@@ -85,9 +85,9 @@ if len(failed_ping) != 0:
     print("------------- Ping Report -------------")
     print("Failed to Ping device(s): ")
     print(failed_ping)
-    pings = open("failed_pings.txt", "w+")  # write the IP of failed pings to a file 
-    for i in failed_ping:
-        pings.write(i)
+    pings = open("failed_pings.txt", "w+")  # write the failed pings to a file
+    for ping in failed_ping:
+        pings.write(ping)
         pings.write(',')
     pings.close()
 elif len(failed_ping) == 0:
@@ -100,9 +100,9 @@ if len(failed_ssh) != 0:
     print("------------- SSH Report -------------")
     print("Failed to Connect to device(s): ")
     print(failed_ssh)
-    connections = open("failed_connections.txt", "w+")  # write the IP of failed connections to a file 
-    for j in failed_ssh:
-        connections.write(j)
+    connections = open("failed_connections.txt", "w+")  # write the failed connections to a file
+    for ssh in failed_ssh:
+        connections.write(ssh)
         connections.write(',')
     connections.close()
 elif len(failed_ssh) == 0:
