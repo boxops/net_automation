@@ -1,4 +1,4 @@
-#R1
+#R1 - C1941
 
 conf t
 hostname R1
@@ -15,7 +15,7 @@ ip add 240.0.10.1 255.255.0.0
 end
 wr
 
-#R2
+#R2 - C1941
 
 conf t
 hostname R2
