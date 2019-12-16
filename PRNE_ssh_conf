@@ -23,7 +23,6 @@ login local
 logging synchronous
 transport input all
 exit
-
 line vty 5 15
 password cisco
 login local
