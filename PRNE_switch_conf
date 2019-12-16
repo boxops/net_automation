@@ -1,7 +1,7 @@
 
 
 
-#S1
+#S1 - C2960
 
 conf t
 hostname S1
@@ -26,7 +26,7 @@ ip default-gateway 10.0.0.1
 end
 wr
 
-#S2
+#S2 - C2960
 
 conf t
 hostname S2
