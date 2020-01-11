@@ -4,7 +4,7 @@ import os
 
 # Customise variables before running the script
 # ---------------------------------------------------------------------------------------------------------
-commands = ["sh version", "sh cdp neighbors", "sh spanning-tree"]  # cisco ios commands to write into a file
+commands = ["sh version", "sh cdp neighbors", "sh spanning-tree"]  # cisco ios commands to write into a file 
 operating_system = "Windows"  # choose the operating system the script is running on: Windows, Linux or Mac
 ping_count = str(4)  # alter the number of pings to speed up or slow down the script
 # ---------------------------------------------------------------------------------------------------------
