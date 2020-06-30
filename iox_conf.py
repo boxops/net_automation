@@ -11,6 +11,15 @@ guest_IP_address = "192.168.200.2 netmask 255.255.255.0"
 app_default_gateway = "192.168.200.1"
 name_server = "8.8.8.8"
 
+device = {
+    "device_type": "cisco_ios",
+    "host": "192.168.126.138",
+    "username": "admin",
+    "password": "Cisco123",
+    "verbose": True,
+    "port": "22"
+}
+
 virtual_port = ["iox", "int " + virtual_port_interface, "ip add " + virtual_port_group_address, "no sh", "ip nat inside"]
 NAT_ACL = ["ip access-list standard " + ACL_name, "permit " + ACL_permit_address]
 app_hosting = ["ip nat inside source list " + ACL_name + " interface " + NAT_inside_interface + " overload",
@@ -20,15 +29,6 @@ app_gate = ["app-hosting appid guestshell", "app-default-gateway " + app_default
             "name-server0 " + name_server]
 guest_shell_enable = "guestshell enable"
 app_hosting_list = "show app-hosting list"
-
-device = {
-    "device_type": "cisco_ios",
-    "host": "192.168.126.138",
-    "username": "admin",
-    "password": "Cisco123",
-    "verbose": True,
-    "port": "22"
-}
 
 session = ConnectHandler(**device)
 
